@@ -40,7 +40,7 @@ function [sbeo2] = sbe43oxygen( t, s, p, oxV, interval, cal, varargin )
 
 % calculate time from the interval
 % (assume constant sampling interval)
-timeS = cumsum( ones( size( p ) ).*interval); 
+timeS = cumsum( ones( size( p ) ).*interval);
 
 % define the defaults and the default settings
 defaultnames = {'taucorrection', 'taucorrectionwin',...
@@ -123,7 +123,8 @@ switch hysteresiscorrection
         oxV = oxnew - VOFFSET; 
 end %switch
 
-
 % calculate oxygen concentration with all corrections
 sbeo2 = SOC.*(oxV + VOFFSET + taucorr).*tcorr.*pcorr.*oxsol;
+
+
 
