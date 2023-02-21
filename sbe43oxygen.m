@@ -1,4 +1,4 @@
-function [sbeo2] = sbe43oxygen( t, s, p, oxV, interval, cal, varargin )
+function [sbeo2,oxV] = sbe43oxygen( t, s, p, oxV, interval, cal, H, varargin )
  
 % function [sbeo2] = sbe43oxygen(t, s, p, oxV, interval, cal, .... )
 %
@@ -40,13 +40,18 @@ function [sbeo2] = sbe43oxygen( t, s, p, oxV, interval, cal, varargin )
 
 % calculate time from the interval
 % (assume constant sampling interval)
-timeS = cumsum( ones( size( p ) ).*interval);
+% timeS = cumsum( ones( size( p ) ).*interval); % KF have timeseries
+timeS = interval; 
 
 % define the defaults and the default settings
 defaultnames = {'taucorrection', 'taucorrectionwin',...
     'hysteresiscorrection', 'H'}; 
+% defaultvalues = {'off', 2,...
+%     'off', [-0.033, 5000, 1450]}; 
+% defaultvalues = {'off', 2,...
+%     'off', [-0.04, 5000, 2000]}; 
 defaultvalues = {'off', 2,...
-    'off', [-0.033, 5000, 1450]}; 
+    'off', H}; % Changed H to an input 
 
 % apply the additional arguments if they have been included in the function
 % line
@@ -81,7 +86,8 @@ E = cal.E;
 [oxsol, ~] = sbsoxygensol( t, s, 'sbs' );
 
 % calculate the temperature dependence term
-tcorr = 1.0 + A.*t + B.*t.*t + C.*t.*t.*t;
+% tcorr = 1.0 + A.*t + B.*t.*t + C.*t.*t.*t;
+tcorr = 1.0 + (A.*t) + (B.*t.^2) + (C.*t.^3);
 
 % calculate the efolding pressure correction term
 % convert temeprature to kelvin
@@ -124,7 +130,8 @@ switch hysteresiscorrection
 end %switch
 
 % calculate oxygen concentration with all corrections
-sbeo2 = SOC.*(oxV + VOFFSET + taucorr).*tcorr.*pcorr.*oxsol;
+% sbeo2 = SOC.*(oxV + VOFFSET + taucorr).*tcorr.*pcorr.*oxsol;
+sbeo2 = SOC.*(oxV + VOFFSET).*tcorr.*pcorr.*oxsol;
 
 
 
